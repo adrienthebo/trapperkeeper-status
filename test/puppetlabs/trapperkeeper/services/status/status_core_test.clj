@@ -51,6 +51,19 @@
               "1.2.0" 3
               (fn [] "foo repeat")))))))
 
+(deftest get-status-fn-test
+  (testing "getting the status function with an unspecified status version"
+    (let [status-fns (atom {})]
+      (update-status-context status-fns "foo" "1.1.0" 1 (fn [] "foo v1"))
+      (update-status-context status-fns "foo" "1.1.0" 2 (fn [] "foo v2"))
+      (update-status-context status-fns "bar" "1.1.0" 1 (fn [] "bar v1"))
+
+      (let [status-fn (get-status-fn @status-fns "foo" nil)]
+      (is (= "foo v2" (status-fn))))
+      )
+    )
+  )
+
 (deftest error-handling-test
   (testing "when there is an error checking status"
 
