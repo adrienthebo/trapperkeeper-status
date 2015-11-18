@@ -51,6 +51,20 @@
               "1.2.0" 3
               (fn [] "foo repeat")))))))
 
+(deftest service-info-matching-version-test
+  (let [service-info [(service-status-map "1.1.0" 1 (fn [level] :state :unknown :status "status version 1"))
+                      (service-status-map "1.1.0" 2 (fn [level] :state :unknown :status "status version 2"))]]
+    (testing "with a nil status version"
+      (let [status (service-info-matching-version "foo" service-info nil)
+            status-fn (:status-fn status)]
+        (is (= "status version 1" (status-fn :critical)) "selects the most recent status version")))
+    (testing "with a specific status version"
+      (let [status (service-info-matching-version "foo" service-info 1)
+            status-fn (:status-fn status)]
+        (is (= "status version 1" (status-fn :critical)) "returns the appropriate status when set"))
+      )
+    ))
+
 (deftest error-handling-test
   (testing "when there is an error checking status"
 
